@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>test-page</title>
+        <link rel="stylesheet" href="../static/css/semantic.css" media="screen" title="no title" charset="utf-8">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.5.2/animate.css" />
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/1.0.28/vue.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/reqwest/2.0.5/reqwest.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/js-cookie/2.1.3/js.cookie.js"></script>
+    </head>
+
+    <body id="app" v-on:mousemove="sliderMoving" v-on:mouseup="sliderMoveStop">
+
+        <div class="ui basic inverted segment" style="background-color:#e0e1e2;width:280px;height:28px;padding:0;">
+
+            <div v-on:mousedown="sliderMoveStart_lower" v-bind:style="{ left:posX_lower + 'px', transform:'translate(' + mouseX_lower + ',0%)' }" class="ui button" style="position:absolute;background-color:#fcc416;width:28px;height:28px;padding:12px;">
+                <h3 style="position:relative;transform:translate(-50%,-50%);top:50%;left:-6px;">下<br>{{ putValue_lower }}</h3>
+            </div>
+
+            <div v-on:mousedown="sliderMoveStart_upper" v-bind:style="{ left:posX_upper + 'px', transform:'translate(' + mouseX_upper + ',0%)' }" class="ui button" style="position:absolute;background-color:#fcc416;width:28px;height:28px;padding:12px;">
+                <h3 style="position:relative;transform:translate(-50%,-50%);top:50%;left:-6px;">上<br>{{ putValue_upper }}</h3>
+            </div>
+
+        </div>
+
+        <script>
+            vm = new Vue ({
+                el:"#app", // 作用范围
+//              ----------------------------------------------------------------
+                data:{ // 模板作用范围内及本个Vue实例对象（即vm）中要用到的数据对象
+                    // 注：这里的数据对象可用于模板的渲染，可以用于方法和表达式的调用
+                    sliderMovingEnable_lower:false,
+                    sliderMovingEnable_upper:false,
+                    startX_lower:0,
+                    stopX_lower:14,
+                    posX_lower:14,
+                    mouseX_lower:'-50%',
+                    startX_upper:280,
+                    stopX_upper:266,
+                    posX_upper:266,
+                    mouseX_upper:'-50%',
+                    range_lower:0,
+                    range_upper:10000,
+                    putValue_lower:0,
+                    putValue_upper:10000,
+                },
+//              ----------------------------------------------------------------
+                methods:{ // 作用范围内的元素要用到的方法
+                    // 下滑块
+                    sliderMoveStart_lower:function (event) {
+                        this.startX_lower = this.stopX_lower; // 不知为何，加这个就好了
+                        this.sliderMovingEnable_lower = true;
+                        // this.mouseX_lower =
+                        //     (
+                        //         round((event.clientX-this.posX_lower+14) * (-50/14))
+                        //     ).toString() + '%';
+                        // this.posX_lower = event.clientX;
+                    },
+                    // 上滑块
+                    sliderMoveStart_upper:function (event) {
+                        this.startX_upper = this.stopX_upper; // 不知为何，加这个就好了
+                        this.sliderMovingEnable_upper = true;
+                        // this.mouseX_lower =
+                        //     (
+                        //         round((event.clientX-this.posX_lower+14) * (-50/14))
+                        //     ).toString() + '%';
+                        // this.posX_upper = event.clientX;
+                    },
+                    sliderMoveStop:function () {
+                        this.sliderMovingEnable_lower = false;
+                        this.startX_lower = this.stopX_lower;
+                        this.sliderMovingEnable_upper = false;
+                        this.startX_upper = this.stopX_upper;
+                    },
+                    sliderMoving:function (event) {
+                        if (this.sliderMovingEnable_lower) {
+                            var this_posX_lower =
+                                event.clientX - this.startX_lower + this.stopX_lower;
+                            this.posX_lower =
+                                this_posX_lower <= 14 ? 14 :
+                                    this_posX_lower >= this.posX_upper - 28 ? this.posX_upper - 28 : this_posX_lower;
+                            console.log("event.clientX = " + event.clientX);
+                            console.log("this_posX_lower = " + this_posX_lower);
+                            console.log("this.posX_lower = " + this.posX_lower);
+                            var k =
+                                (this.posX_lower - 14)
+                                / (266 - 28 - 14);
+                            this.putValue_lower = Math.round(
+                                (this.range_upper - this.range_lower) * k
+                                - this.range_lower);
+                        };
+                        if (this.sliderMovingEnable_upper) {
+                            var this_posX_upper =
+                                event.clientX - this.startX_upper + this.stopX_upper;
+                            this.posX_upper =
+                                this_posX_upper >= 266 ? 266 :
+                                    this_posX_upper <= 28 + this.posX_lower ? 28 + this.posX_lower : this_posX_upper;
+                            var k =
+                                (this.posX_upper - 14 - 28)
+                                / (266 - 14 - 28);
+                            this.putValue_upper = Math.round(
+                                (this.range_upper - this.range_lower) * k
+                                - this.range_lower);
+                        };
+                    },
+                },
+//              ----------------------------------------------------------------
+                computed:{ // 作用范围内的元素要用到的表达式（表达式不同于方法）
+                    // 注意：引用的数据对象只能来自vm的data，return的是字符串
+
+                },
+//              ----------------------------------------------------------------
+                ready:function () { // Vue实例对象（即vm）被创建后首先要做什么
+
+                }
+//              ----------------------------------------------------------------
+            })
+        </script>
+
+    </body>
+
+</html>
